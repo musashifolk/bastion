@@ -1,0 +1,35 @@
+name: compliance-check
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  run-checker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: install dependencies
+        run: pip install -r compliance-checker/requirements.txt
+
+      - name: run compliance checker
+        run: |
+          mkdir -p compliance-checker/reports
+          cd compliance-checker
+          python checker.py
+
+      - name: upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-report
+          path: compliance-checker/reports/report.json
