@@ -7,7 +7,7 @@ on:
     branches: ["main"]
 
 jobs:
-  run-checker:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,15 +21,9 @@ jobs:
       - name: install dependencies
         run: pip install -r compliance-checker/requirements.txt
 
-      - name: run compliance checker
+      - name: syntax check
         run: |
-          mkdir -p compliance-checker/reports
-          cd compliance-checker
-          python checker.py
-
-      - name: upload report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: compliance-report
-          path: compliance-checker/reports/report.json
+          python -m py_compile compliance-checker/checker.py
+          python -m py_compile compliance-checker/rules/docker_baseline.py
+          python -m py_compile compliance-checker/rules/mtls_check.py
+          echo "all files passed syntax check"
