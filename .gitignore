@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+compliance-checker/reports/*.json
+compliance-checker/reports/*.html
+.env
+*.egg-info/
+.venv/

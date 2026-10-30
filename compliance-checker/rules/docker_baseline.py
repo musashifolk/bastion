@@ -1,5 +1,7 @@
 import docker
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+
+IMAGE_AGE_LIMIT_DAYS = 90
 
 def run_baseline_checks(container):
     findings = []
@@ -55,8 +57,29 @@ def run_baseline_checks(container):
         "detail": f"exposed={list(ports.keys())}"
     })
 
+    # image age check
+    findings.append(_check_image_age(container))
+
     return {
         "container": container.name,
         "image": container.image.tags[0] if container.image.tags else "untagged",
         "findings": findings
     }
+
+def _check_image_age(container):
+    try:
+        created_str = container.image.attrs.get("Created", "")
+        created = datetime.fromisoformat(created_str.replace("Z", "+00:00"))
+        age = datetime.now(timezone.utc) - created
+        stale = age > timedelta(days=IMAGE_AGE_LIMIT_DAYS)
+        return {
+            "check": "image_not_stale",
+            "status": "FAIL" if stale else "PASS",
+            "detail": f"image_age_days={age.days}"
+        }
+    except Exception as e:
+        return {
+            "check": "image_not_stale",
+            "status": "FAIL",
+            "detail": f"could not determine image age: {e}"
+        }
