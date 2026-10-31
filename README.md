@@ -17,6 +17,7 @@ Checks every running container for:
 - Restart policy configured
 - No unnecessary ports exposed to host
 - Image not older than 90 days
+- No unresolved CRITICAL vulnerabilities (via Trivy)
 - mTLS enforced on internal routes (FAIL until Part 2)
 
 Outputs `reports/report.json` for CI and `reports/report.html` for human review.
@@ -40,4 +41,4 @@ docker compose up -d
 
 ## Stack
 
-Python · Docker · step-ca · Traefik v3 · GitHub Actions · Debian 13
+Python · Docker · Trivy · step-ca · Traefik v3 · GitHub Actions · Debian 13

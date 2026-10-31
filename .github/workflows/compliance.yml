@@ -21,9 +21,17 @@ jobs:
       - name: install dependencies
         run: pip install -r compliance-checker/requirements.txt
 
+      - name: install trivy
+        run: |
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update -q
+          sudo apt-get install -y trivy
+
       - name: syntax check
         run: |
           python -m py_compile compliance-checker/checker.py
           python -m py_compile compliance-checker/rules/docker_baseline.py
           python -m py_compile compliance-checker/rules/mtls_check.py
+          python -m py_compile compliance-checker/rules/trivy_check.py
           echo "all files passed syntax check"

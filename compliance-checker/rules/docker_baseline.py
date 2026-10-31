@@ -1,5 +1,6 @@
 import docker
 from datetime import datetime, timezone, timedelta
+from rules.trivy_check import run_trivy_scan
 
 IMAGE_AGE_LIMIT_DAYS = 90
 
@@ -8,7 +9,6 @@ def run_baseline_checks(container):
     inspect = container.client.api.inspect_container(container.id)
     config = inspect["HostConfig"]
 
-    # root user check
     user = inspect["Config"].get("User", "")
     findings.append({
         "check": "no_root_user",
@@ -16,7 +16,6 @@ def run_baseline_checks(container):
         "detail": f"user='{user}'"
     })
 
-    # privileged check
     privileged = config.get("Privileged", False)
     findings.append({
         "check": "not_privileged",
@@ -24,7 +23,6 @@ def run_baseline_checks(container):
         "detail": f"privileged={privileged}"
     })
 
-    # memory limit
     mem = config.get("Memory", 0)
     findings.append({
         "check": "memory_limit_set",
@@ -32,7 +30,6 @@ def run_baseline_checks(container):
         "detail": f"memory={mem}"
     })
 
-    # cpu limit
     cpu = config.get("NanoCpus", 0)
     findings.append({
         "check": "cpu_limit_set",
@@ -40,7 +37,6 @@ def run_baseline_checks(container):
         "detail": f"nano_cpus={cpu}"
     })
 
-    # restart policy
     restart = config.get("RestartPolicy", {}).get("Name", "")
     findings.append({
         "check": "restart_policy_set",
@@ -48,7 +44,6 @@ def run_baseline_checks(container):
         "detail": f"restart_policy='{restart}'"
     })
 
-    # unnecessary ports exposed to host
     ports = config.get("PortBindings") or {}
     risky = [p for p in ports if p.startswith("9090")]
     findings.append({
@@ -57,12 +52,15 @@ def run_baseline_checks(container):
         "detail": f"exposed={list(ports.keys())}"
     })
 
-    # image age check
     findings.append(_check_image_age(container))
+
+    image = container.image.tags[0] if container.image.tags else None
+    if image:
+        findings.append(run_trivy_scan(image))
 
     return {
         "container": container.name,
-        "image": container.image.tags[0] if container.image.tags else "untagged",
+        "image": image or "untagged",
         "findings": findings
     }
 
