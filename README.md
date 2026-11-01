@@ -39,6 +39,14 @@ docker compose up -d
 
 ---
 
+## Part 3 — mTLS Enforcement
+
+Traefik is configured to enforce mutual TLS on all internal service routes using certificates issued by step-ca. Every service (Grafana, Prometheus, Portainer) requires a client cert signed by the internal CA. Unauthenticated requests are rejected at the proxy layer.
+
+See `mtls/README.md` for setup details.
+
+---
+
 ## Stack
 
 Python · Docker · Trivy · step-ca · Traefik v3 · GitHub Actions · Debian 13

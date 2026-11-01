@@ -1,0 +1,47 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: ":443"
+
+api:
+  dashboard: true
+  insecure: false
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: traefik_default
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+
+certificatesResolvers:
+  step-ca:
+    acme:
+      email: admin@bastion.local
+      caServer: https://step-ca:9000/acme/acme/directory
+      storage: /certs/acme.json
+      tlsChallenge: {}
+
+log:
+  level: INFO
+
+tls:
+  options:
+    mtls:
+      clientAuth:
+        caFiles:
+          - /certs/root_ca.crt
+        clientAuthType: RequireAndVerifyClientCert

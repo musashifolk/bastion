@@ -1,0 +1,41 @@
+http:
+  routers:
+    grafana:
+      rule: "Host(`grafana.bastion.local`)"
+      entryPoints: ["websecure"]
+      service: grafana
+      tls:
+        certResolver: step-ca
+        options: mtls
+
+    prometheus:
+      rule: "Host(`prometheus.bastion.local`)"
+      entryPoints: ["websecure"]
+      service: prometheus
+      tls:
+        certResolver: step-ca
+        options: mtls
+
+    portainer:
+      rule: "Host(`portainer.bastion.local`)"
+      entryPoints: ["websecure"]
+      service: portainer
+      tls:
+        certResolver: step-ca
+        options: mtls
+
+  services:
+    grafana:
+      loadBalancer:
+        servers:
+          - url: "http://grafana:3000"
+
+    prometheus:
+      loadBalancer:
+        servers:
+          - url: "http://prometheus:9090"
+
+    portainer:
+      loadBalancer:
+        servers:
+          - url: "http://portainer:9000"
