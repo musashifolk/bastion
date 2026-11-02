@@ -47,6 +47,6 @@ See `mtls/README.md` for setup details.
 
 ---
 
-## Stack
+## Stack1
 
 Python · Docker · Trivy · step-ca · Traefik v3 · GitHub Actions · Debian 13
