@@ -2,7 +2,7 @@
 
 Bastion is a homelab security project built around a simple loop: audit your infrastructure, fix what's broken, verify the fix.
 
-It does two things. First, a Python-based compliance checker inspects your running Docker environment and produces a report flagging containers with missing limits, bad restart policies, root users, stale images, and missing mTLS. Second, an internal PKI built on step-ca issues and rotates TLS certificates, and Traefik is configured to enforce mTLS across all internal service routes. Once Part 2 is complete, re-running the checker should pass every check.
+It does two things. First, a Python-based compliance checker inspects your running Docker environment and produces a report flagging containers with missing limits, bad restart policies, root users, stale images, and missing mTLS. Second, an internal PKI built on step-ca issues and rotates TLS certificates, and Traefik is configured to enforce mTLS across all internal service routes. Once Part 2 and 3 are complete, re-running the checker passes every check.
 
 CI runs on every push. If the compliance score drops, the pipeline fails.
 
@@ -18,7 +18,7 @@ Checks every running container for:
 - No unnecessary ports exposed to host
 - Image not older than 90 days
 - No unresolved CRITICAL vulnerabilities (via Trivy)
-- mTLS enforced on internal routes (FAIL until Part 2)
+- mTLS enforced on internal routes (FAIL until Part 3)
 
 Outputs `reports/report.json` for CI and `reports/report.html` for human review.
 
@@ -31,6 +31,8 @@ python checker.py
 ---
 
 ## Part 2 — Internal PKI
+
+Runs step-ca as an internal certificate authority in Docker. Handles cert issuance and automatic rotation via ACME. All internal services get certs signed by this CA.
 
 ```bash
 cd pki/step-ca
@@ -47,6 +49,6 @@ See `mtls/README.md` for setup details.
 
 ---
 
-## Stack1
+## Stack
 
 Python · Docker · Trivy · step-ca · Traefik v3 · GitHub Actions · Debian 13
