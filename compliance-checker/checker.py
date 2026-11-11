@@ -1,3 +1,4 @@
+import os
 import docker
 import json
 import sys
@@ -27,12 +28,12 @@ def main():
         "results": results,
     }
 
+    os.makedirs("reports", exist_ok=True)
     with open("reports/report.json", "w") as f:
         json.dump(report, f, indent=2)
 
     with open("reports/report.html", "w") as f:
         f.write(_render_html(report))
-
     print(json.dumps(report, indent=2))
 
     if pass_rate < 100:
