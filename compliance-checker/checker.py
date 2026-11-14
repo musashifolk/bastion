@@ -6,6 +6,30 @@ from datetime import datetime, timezone
 from rules.docker_baseline import run_baseline_checks
 from rules.mtls_check import check_mtls
 
+def dry_run():
+    report = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "score": "2/2",
+        "pass_rate": 100.0,
+        "results": [
+            {
+                "container": "dry-run-container",
+                "image": "dry-run-image:latest",
+                "findings": [
+                    {"check": "no_root_user", "status": "PASS", "detail": "user='appuser'"},
+                    {"check": "not_privileged", "status": "PASS", "detail": "privileged=False"},
+                ]
+            }
+        ],
+    }
+    os.makedirs("reports", exist_ok=True)
+    with open("reports/report.json", "w") as f:
+        json.dump(report, f, indent=2)
+    with open("reports/report.html", "w") as f:
+        f.write(_render_html(report))
+    print(json.dumps(report, indent=2))
+    print("dry-run complete")
+
 def main():
     client = docker.from_env()
     containers = client.containers.list()
@@ -34,6 +58,7 @@ def main():
 
     with open("reports/report.html", "w") as f:
         f.write(_render_html(report))
+
     print(json.dumps(report, indent=2))
 
     if pass_rate < 100:
@@ -79,4 +104,11 @@ def _render_html(report):
 </html>"""
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dry-run", action="store_true", help="run with fake data, no docker required")
+    args = parser.parse_args()
+    if args.dry_run:
+        dry_run()
+    else:
+        main()

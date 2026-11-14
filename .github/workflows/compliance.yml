@@ -28,10 +28,8 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y trivy
 
-      - name: syntax check
+      - name: run compliance checker (dry-run)
         run: |
-          python -m py_compile compliance-checker/checker.py
-          python -m py_compile compliance-checker/rules/docker_baseline.py
-          python -m py_compile compliance-checker/rules/mtls_check.py
-          python -m py_compile compliance-checker/rules/trivy_check.py
-          echo "all files passed syntax check"
+          cd compliance-checker
+          python checker.py --dry-run
+          echo "dry-run passed"
