@@ -77,6 +77,9 @@ def _render_html(report):
                 <td>{f['detail']}</td>
             </tr>"""
 
+    score_class = "pass" if report["pass_rate"] == 100 else "fail"
+    score_icon = "✅" if report["pass_rate"] == 100 else "❌"
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,13 +92,15 @@ def _render_html(report):
   table {{ width: 100%; border-collapse: collapse; }}
   th {{ text-align: left; border-bottom: 1px solid #30363d; padding: 0.5rem; color: #8b949e; }}
   td {{ padding: 0.5rem; border-bottom: 1px solid #21262d; }}
-  .score {{ font-size: 1.4rem; margin-bottom: 0.5rem; }}
+  .score {{ font-size: 2rem; margin-bottom: 1rem; padding: 1rem; border-radius: 6px; background: #161b22; border: 1px solid #30363d; }}
+  .pass {{ color: #2ecc71; }}
+  .fail {{ color: #e74c3c; }}
 </style>
 </head>
 <body>
 <h1>Bastion — Compliance Report</h1>
 <div class="meta">Generated: {report['generated_at']}</div>
-<div class="score">Score: <strong>{report['score']}</strong> &nbsp;|&nbsp; Pass rate: <strong>{report['pass_rate']}%</strong></div>
+<div class="score {score_class}">{score_icon} Score: <strong>{report['score']}</strong> &nbsp;|&nbsp; Pass rate: <strong>{report['pass_rate']}%</strong></div>
 <table>
   <thead><tr><th>Container</th><th>Check</th><th>Status</th><th>Detail</th></tr></thead>
   <tbody>{rows}</tbody>
