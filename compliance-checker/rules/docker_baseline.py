@@ -44,12 +44,14 @@ def run_baseline_checks(container):
         "detail": f"restart_policy='{restart}'"
     })
 
+    import os
+    allowed_ports = set(os.environ.get("ALLOWED_PORTS", "80,443").split(","))
     ports = config.get("PortBindings") or {}
-    risky = [p for p in ports if p.startswith("9090")]
+    risky = [p for p in ports if p.split("/")[0] not in allowed_ports]
     findings.append({
         "check": "no_unnecessary_host_ports",
         "status": "FAIL" if risky else "PASS",
-        "detail": f"exposed={list(ports.keys())}"
+        "detail": f"exposed={list(ports.keys())}, allowed={list(allowed_ports)}"
     })
 
     findings.append(_check_image_age(container))
