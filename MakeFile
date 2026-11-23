@@ -1,0 +1,16 @@
+.PHONY: check dry-run up-pki down-pki report
+
+check:
+	cd compliance-checker && python checker.py
+
+dry-run:
+	cd compliance-checker && python checker.py --dry-run
+
+up-pki:
+	cd pki/step-ca && docker compose up -d
+
+down-pki:
+	cd pki/step-ca && docker compose down
+
+report:
+	xdg-open compliance-checker/reports/report.html
