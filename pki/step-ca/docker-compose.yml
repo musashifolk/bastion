@@ -1,17 +1,21 @@
 services:
   step-ca:
-    image: smallstep/step-ca:latest
+    image: smallstep/step-ca:0.27.4
     container_name: step-ca
     restart: unless-stopped
-    ports:
-      - "9000:9000"
     volumes:
       - step-ca-data:/home/step
     environment:
-      - DOCKER_STEPCA_INIT_NAME=BastonCA
+      - DOCKER_STEPCA_INIT_NAME=BastionCA
       - DOCKER_STEPCA_INIT_DNS_NAMES=localhost,step-ca,192.168.1.38
       - DOCKER_STEPCA_INIT_PROVISIONER_NAME=admin
       - DOCKER_STEPCA_INIT_ACME=true
+    networks:
+      - traefik_default
 
 volumes:
   step-ca-data:
+
+networks:
+  traefik_default:
+    external: true
