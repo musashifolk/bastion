@@ -34,3 +34,6 @@ jobs:
           cd compliance-checker
           python checker.py --dry-run
           echo "dry-run passed"
+        # Full checker requires a live Docker daemon with running containers.
+        # Dry-run validates report generation and scoring logic in CI.
+        # Real compliance checks run on the homelab via the self-hosted runner in HomeLab repo.
