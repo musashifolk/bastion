@@ -3,7 +3,7 @@ import socket
 
 TRAEFIK_HOST = "localhost"
 TRAEFIK_PORT = 443
-EXPECTED_CA = "BastonCA"
+EXPECTED_CA = "BastionCA"
 
 def check_mtls():
     result = _verify_tls_cert()
